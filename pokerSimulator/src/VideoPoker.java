@@ -41,9 +41,10 @@ public class VideoPoker {
                 first = false;
             } else {
                 System.out.print("[#] you have " + money + " credits, please choose an option: ");
-            } input.nextLine();
+            }
 
             String choice = input.nextLine();
+
 
             switch (choice) {
                 case "1", "insert", "insert money" -> {

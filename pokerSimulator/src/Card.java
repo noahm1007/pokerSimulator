@@ -19,10 +19,10 @@ public class Card {
     };
 
     public String[][] symbols = new String[][]{
-            {"%", "Clubs"},
-            {"^", "Diamonds"},
-            {"3", "Hearts"},
-            {"&", "Spades"}
+            {"C", "Clubs"},
+            {"D", "Diamonds"},
+            {"H", "Hearts"},
+            {"S", "Spades"}
     };
 
     public String[] asciiCard = new String[]{
