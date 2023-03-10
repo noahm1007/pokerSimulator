@@ -38,6 +38,7 @@ public class Card {
     private int symbol;
     private int value;
     public String[] card;
+    public boolean isHeld = false;
 
     // constructors
     public Card() {
@@ -86,5 +87,25 @@ public class Card {
         for (int i = 0; i < card.length; i++) {
             System.out.println(card[i]);
         }
+    }
+
+    public String name() {
+        String name = "";
+
+        for (int i = 0; i < 8; i++) {
+            if (this.value-2 == i) { name += values[i][1]; }
+        }
+
+        switch (this.value) {
+            case 11 -> name += "Jack";
+            case 12 -> name += "Queen";
+            case 13 -> name += "King";
+            case 14 -> name += "Ace";
+        }
+
+        name += " of ";
+        name += symbols[this.symbol][1];
+
+        return name;
     }
 }
