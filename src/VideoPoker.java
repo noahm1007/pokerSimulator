@@ -159,16 +159,16 @@ public class VideoPoker {
                     System.out.print("[#] hand result: ");
                     int oldBalance = money;
 
-                    if (onePair(hand)) { System.out.print("one pair | payout: " + bet); money+=bet; }
-                    if (twoPair(hand)) { System.out.print("two pair | payout: " + bet*2); money+=bet*2; }
-                    if (threeOfAKind(hand)) { System.out.print("three of a kind | payout: " + bet*3); money+=bet*3; }
-                    if (straight(hand)) { System.out.print("straight | payout: " + bet*4); money+=bet*4; }
-                    if (flush(hand)) { System.out.print("flush | payout: " + bet*5); money+=bet*5; }
-                    if (fullHouse(hand)) { System.out.print("full house | payout: " + bet*8); money+=bet*8; }
-                    if (fourOfAKind(hand)) { System.out.print("four of a kind | payout: " + bet*25); money+=bet*25; }
-                    if (straightFlush(hand)) { System.out.print("straight flush | payout: " + bet*50); money+=bet*50; }
-                    if (royalFlush(hand) && bet != 5) { System.out.print("royal flush 🎉 | payout: " + bet*250); money+=bet*250; }
                     if (royalFlush(hand) && bet == 5) { System.out.print("royal flush 🎉 | payout: " + 4000); money+=4000; }
+                    if (royalFlush(hand) && bet != 5) { System.out.print("royal flush 🎉 | payout: " + bet*250); money+=bet*250; }
+                    if (straightFlush(hand)) { System.out.print("straight flush | payout: " + bet*50); money+=bet*50; }
+                    if (fourOfAKind(hand)) { System.out.print("four of a kind | payout: " + bet*25); money+=bet*25; }
+                    if (fullHouse(hand)) { System.out.print("full house | payout: " + bet*8); money+=bet*8; }
+                    if (flush(hand)) { System.out.print("flush | payout: " + bet*5); money+=bet*5; }
+                    if (straight(hand)) { System.out.print("straight | payout: " + bet*4); money+=bet*4; }
+                    if (threeOfAKind(hand)) { System.out.print("three of a kind | payout: " + bet*3); money+=bet*3; }
+                    if (twoPair(hand)) { System.out.print("two pair | payout: " + bet*2); money+=bet*2; }
+                    if (onePair(hand)) { System.out.print("one pair | payout: " + bet); money+=bet; }
                     if (oldBalance == money) { System.out.print("nothing!"); }
 
                     hand.clear();
@@ -218,26 +218,28 @@ public class VideoPoker {
         }
     }
 
-//    hand methods
-
     public static int minCardIndex(ArrayList<Card> hand) {
-        int minValue = 0;
+        int minValue = hand.get(0).getValue();
+        int minIndex = 0;
 
         for (int i = 1; i < hand.size(); i++) {
             if (hand.get(i).getValue() < minValue) {
-                minValue = i;
+                minValue = hand.get(i).getValue();
+                minIndex = i;
             }
-        } return minValue;
+        }
+        return minIndex;
     }
 
     public static ArrayList<Card> sortHand(ArrayList<Card> hand) {
-        ArrayList<Card> tempHand = hand;
+        ArrayList<Card> tempHand = new ArrayList<Card>(hand);
         ArrayList<Card> sortedHand = new ArrayList<Card>();
 
-        for (int i = 0; i < tempHand.size(); i++) {
+        for (int i = 0; i < hand.size(); i++) {
             for (int j = 0; j < tempHand.size(); j++) {
-                if (minCardIndex(hand) == i) {
-                    sortedHand.add(hand.get(i));
+                if (minCardIndex(tempHand) == j) {
+                    sortedHand.add(tempHand.get(j));
+                    tempHand.remove(j);
                 }
             }
         }
@@ -245,9 +247,11 @@ public class VideoPoker {
         return sortedHand;
     }
 
+    //    hand methods
+
     public static boolean onePair(ArrayList<Card> hand) {
         hand = sortHand(hand);
-        for (int i = 0; i < hand.size(); i++) {
+        for (int i = 0; i < hand.size()-1; i++) {
             if (hand.get(i).getValue() == hand.get(i+1).getValue()) { return true; }
         }
         return false;
@@ -255,14 +259,14 @@ public class VideoPoker {
 
     public static boolean twoPair(ArrayList<Card> hand) {
         hand = sortHand(hand);
-        boolean hasPair = false;
+        boolean foundPair = false;
 
         for (int i = 0; i < hand.size()-1; i++) {
-            for (int j = 0; j < hand.size(); j++) {
+            for (int j = 1; j < hand.size(); j++) {
                 if (hand.get(i).getValue() == hand.get(j).getValue()) {
                     hand.remove(i);
                     hand.remove(j-1);
-                    hasPair = true;
+                    foundPair = true;
                 }
             }
         }
@@ -271,48 +275,36 @@ public class VideoPoker {
     }
 
     public static boolean threeOfAKind(ArrayList<Card> hand) {
-        for (int i = 0; i < hand.size() - 2; i++) {
-            Card c1 = hand.get(i);
-            int count = 1;
-            for (int j = i + 1; j < hand.size(); j++) {
-                Card c2 = hand.get(j);
-                if (c1.getValue() == c2.getValue()) {
-                    count++;
-                    if (count == 3) {
-                        return true;
-                    }
-                }
+        hand = sortHand(hand);
+
+        for (int i = 0; i < hand.size()-2; i++) {
+            if (hand.get(i).getValue() == hand.get(i+1).getValue() && hand.get(i+1).getValue() == hand.get(i+2).getValue()) {
+                return true;
             }
         }
         return false;
     }
 
     public static boolean straight(ArrayList<Card> hand) {
-        int minCard = hand.get(0).getValue();
-        int c = 1;
-
-        for (Card card : hand) {
-            if (card.getValue() < minCard) {
-                minCard = card.getValue();
-            }
-        }
-
-        if (minCard == 2) {
-            for (Card card : hand) {
-                if (card.getValue() == 14) {
-                    minCard = 1;
-                }
-            }
-        }
-
+        hand = sortHand(hand);
         for (int i = 0; i < hand.size(); i++) {
-            for (Card card : hand) {
-                if (card.getValue() == minCard + c) {
-                    c++;
+            if (hand.get(0).getValue() == 2) {
+                if (hand.get(i).getValue() == 14) {
+                    hand.get(i).setValue(1);
                 }
             }
         }
-        return c == 5;
+
+        hand = sortHand(hand);
+        int value = hand.get(0).getValue();
+
+        for (int i = 1; i < hand.size(); i++) {
+            if (hand.get(i).getValue() == value+1) {
+                value = hand.get(i).getValue();
+            }
+        }
+
+        return value == hand.get(0).getValue()+4;
     }
 
     public static boolean flush(ArrayList<Card> hand) {
@@ -328,66 +320,49 @@ public class VideoPoker {
     }
 
     public static boolean fullHouse(ArrayList<Card> hand) {
-        boolean hasThreeOfKind = false;
-        boolean hasPair = false;
+        hand = sortHand(hand);
 
-        for (int i = 0; i < hand.size(); i++) {
-            int count = 0;
-            for (int j = 0; j < hand.size(); j++) {
-                if (hand.get(i).getValue() == hand.get(j).getValue()) {
-                    count++;
+        for (int i = 0; i < hand.size()-2; i++) {
+            if (hand.get(i).getValue() == hand.get(i+1).getValue() && hand.get(i+1).getValue() == hand.get(i+2).getValue()) {
+                for (int j = 0; j < 3; j++) {
+                    hand.remove(i);
                 }
             }
-            if (count == 3) {
-                hasThreeOfKind = true;
-            } else if (count == 2) {
-                hasPair = true;
-            }
         }
 
-        return hasThreeOfKind && hasPair;
+        return hand.size() == 2 && onePair(hand);
     }
-
 
     public static boolean fourOfAKind(ArrayList<Card> hand) {
-        for (int i = 0; i < hand.size(); i++) {
-            int c = 0;
-
-            for (int j = 0; j < hand.size(); j++) {
-                if (hand.get(i).getValue() == hand.get(j).getValue()) { c++; }
-            } return c == 4;
-        } return false;
+        hand = sortHand(hand);
+        return twoPair(hand) && hand.get(1).getValue() == hand.get(3).getValue();
     }
 
-    public static boolean straightFlush(ArrayList<Card> hand) { return flush(hand) && straight(hand); }
+    public static boolean straightFlush(ArrayList<Card> hand) {
+        hand = sortHand(hand);
+        return straight(hand) && flush(hand);
+    }
 
     public static boolean royalFlush(ArrayList<Card> hand) {
-        int minCard = hand.get(0).getValue();
-
-        for (Card card : hand) {
-            if (card.getValue() < minCard) {
-                minCard = card.getValue();
-            }
-        }
-
-        if (minCard >= 10) { return straight(hand) && flush(hand); } return false;
+        hand = sortHand(hand);
+        return straightFlush(hand) && minCardIndex(hand) == 0;
     }
 
     public static void methodTest() {
 //        plug in card values and change return statement
         ArrayList<Card> hand = new ArrayList<>();
 
-        hand.add(new Card(2, 2)); // symbol, value
-        hand.add(new Card(0, 3));
-        hand.add(new Card(3, 4));
-        hand.add(new Card(0, 5));
+        hand.add(new Card(3, 10)); // symbol, value
+        hand.add(new Card(3, 11));
         hand.add(new Card(3, 13));
+        hand.add(new Card(3, 12));
+        hand.add(new Card(3, 14));
 
         for (int i = 0; i < hand.size(); i++) { hand.get(i).fillCard(); }
 
         System.out.println("[ #------- [METHOD TESTING] -------# ]");
         printDeck(hand, 1, 5);
-        System.out.println(twoPair(hand)); // change method
+        System.out.println(royalFlush(hand)); // change method
         System.out.println("[ #------- [METHOD TESTING] -------# ]\n");
     }
 }
