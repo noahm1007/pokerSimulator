@@ -15,7 +15,7 @@ public class VideoPoker {
         shuffleDeck(deck);
 
 //        enable to test methods
-        boolean testingMode = false; // very useful variable
+        boolean testingMode = true; // very useful variable
         if (testingMode) { methodTest(); }
 
         System.out.println("""
@@ -274,14 +274,15 @@ public class VideoPoker {
 
     public static boolean twoPair(ArrayList<Card> hand) {
         hand = sortHand(hand);
-        boolean foundPair = false;
 
-        for (int i = 0; i < hand.size()-1; i++) {
-            for (int j = 1; j < hand.size(); j++) {
-                if (hand.get(i).getValue() == hand.get(j).getValue()) {
-                    hand.remove(i);
-                    hand.remove(j-1);
+        for (int j = 0; j < 2; j++) {
+            boolean foundPair = false;
+            for (int i = 0; i < hand.size()-1; i++) {
+                if (hand.get(i).getValue() == hand.get(i + 1).getValue() && !foundPair) {
                     foundPair = true;
+                    hand.remove(i);
+                    hand.remove(i);
+                    printDeck(hand, 1, hand.size());
                 }
             }
         }
@@ -368,16 +369,16 @@ public class VideoPoker {
         ArrayList<Card> hand = new ArrayList<>();
 
         hand.add(new Card(3, 10)); // symbol, value
-        hand.add(new Card(3, 11));
-        hand.add(new Card(3, 13));
-        hand.add(new Card(3, 12));
-        hand.add(new Card(3, 14));
+        hand.add(new Card(3, 10));
+        hand.add(new Card(0, 5));
+        hand.add(new Card(0, 12));
+        hand.add(new Card(1, 12));
 
         for (int i = 0; i < hand.size(); i++) { hand.get(i).fillCard(); }
 
         System.out.println("[ #------- [METHOD TESTING] -------# ]");
         printDeck(hand, 1, 5);
-        System.out.println(royalFlush(hand)); // change method
+        System.out.println(twoPair(hand)); // change method
         System.out.println("[ #------- [METHOD TESTING] -------# ]\n");
     }
 }
