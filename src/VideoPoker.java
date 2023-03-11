@@ -14,7 +14,8 @@ public class VideoPoker {
         makeDeck(deck);
         shuffleDeck(deck);
 
-        boolean testingMode = true; // very useful variable
+//        enable to test methods
+        boolean testingMode = false; // very useful variable
         if (testingMode) { methodTest(); }
 
         System.out.println("""
@@ -84,6 +85,11 @@ public class VideoPoker {
                             """);
                 }
                 case "3", "bet" -> {
+                    if (money <= 0) {
+                        System.out.println("[#] sorry, you are out of money.");
+                        break;
+                    }
+
                     System.out.print("[#] bet how many credits? (1-5): ");
                     int bet = input.nextInt();
 
@@ -91,6 +97,12 @@ public class VideoPoker {
                         System.out.print("[#] invalid bet, please try again: ");
                         bet = input.nextInt();
                     }
+
+                    if (money-bet < 0) {
+                        System.out.println("[#] sorry, you cannot afford a bet of " + bet + " credits. returning to menu... ");
+                        break;
+                    }
+
                     System.out.println("[#] bet of " + bet + " credits confirmed.");
                     money-=bet;
 
@@ -158,18 +170,19 @@ public class VideoPoker {
 
                     System.out.print("[#] hand result: ");
                     int oldBalance = money;
+                    boolean foundMatch = false;
 
-                    if (royalFlush(hand) && bet == 5) { System.out.print("royal flush 🎉 | payout: " + 4000); money+=4000; }
-                    if (royalFlush(hand) && bet != 5) { System.out.print("royal flush 🎉 | payout: " + bet*250); money+=bet*250; }
-                    if (straightFlush(hand)) { System.out.print("straight flush | payout: " + bet*50); money+=bet*50; }
-                    if (fourOfAKind(hand)) { System.out.print("four of a kind | payout: " + bet*25); money+=bet*25; }
-                    if (fullHouse(hand)) { System.out.print("full house | payout: " + bet*8); money+=bet*8; }
-                    if (flush(hand)) { System.out.print("flush | payout: " + bet*5); money+=bet*5; }
-                    if (straight(hand)) { System.out.print("straight | payout: " + bet*4); money+=bet*4; }
-                    if (threeOfAKind(hand)) { System.out.print("three of a kind | payout: " + bet*3); money+=bet*3; }
-                    if (twoPair(hand)) { System.out.print("two pair | payout: " + bet*2); money+=bet*2; }
-                    if (onePair(hand)) { System.out.print("one pair | payout: " + bet); money+=bet; }
-                    if (oldBalance == money) { System.out.print("nothing!"); }
+                        if (!foundMatch && royalFlush(hand) && bet == 5) { System.out.print("royal flush 🎉 | payout: " + 4000); money+=4000; foundMatch = true; }
+                        if (!foundMatch && royalFlush(hand) && bet != 5) { System.out.print("royal flush 🎉 | payout: " + bet*250); money+=bet*250; foundMatch = true; }
+                        if (!foundMatch && straightFlush(hand)) { System.out.print("straight flush | payout: " + bet*50); money+=bet*50; foundMatch = true; }
+                        if (!foundMatch && fourOfAKind(hand)) { System.out.print("four of a kind | payout: " + bet*25); money+=bet*25; foundMatch = true; }
+                        if (!foundMatch && fullHouse(hand)) { System.out.print("full house | payout: " + bet*8); money+=bet*8; foundMatch = true; }
+                        if (!foundMatch && flush(hand)) { System.out.print("flush | payout: " + bet*5); money+=bet*5; foundMatch = true; }
+                        if (!foundMatch && straight(hand)) { System.out.print("straight | payout: " + bet*4); money+=bet*4; foundMatch = true; }
+                        if (!foundMatch && threeOfAKind(hand)) { System.out.print("three of a kind | payout: " + bet*3); money+=bet*3; foundMatch = true; }
+                        if (!foundMatch && twoPair(hand)) { System.out.print("two pair | payout: " + bet*2); money+=bet*2; foundMatch = true; }
+                        if (!foundMatch && onePair(hand)) { System.out.print("one pair | payout: " + bet); money+=bet; foundMatch = true; }
+                        if (!foundMatch && oldBalance == money) { System.out.print("nothing!"); foundMatch = true; }
 
                     hand.clear();
                     deck.clear();
@@ -252,7 +265,9 @@ public class VideoPoker {
     public static boolean onePair(ArrayList<Card> hand) {
         hand = sortHand(hand);
         for (int i = 0; i < hand.size()-1; i++) {
-            if (hand.get(i).getValue() == hand.get(i+1).getValue()) { return true; }
+            if ((hand.get(i).getValue() == hand.get(i+1).getValue()) && hand.get(i).getValue() >= 11) {
+                return true;
+            }
         }
         return false;
     }
